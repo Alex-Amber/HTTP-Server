@@ -11,9 +11,7 @@
 
 namespace http_server {
   
-  HttpServer::HttpServer() : HttpServer("", -1, "") {}
-
-  HttpServer::HttpServer(const std::string& ip_address, const int port, const std::string& root_path) {
+  HttpServer::HttpServer(const std::string& ip_address, const int port, const std::string& root_path, const int http_major_version, const int http_minor_version) {
     // Check the validity of the argument ip_address.
 
     // Check the validity of the argument port.
@@ -23,6 +21,8 @@ namespace http_server {
     ip_address_ = ip_address;
     port_ = port;
     root_path_ = root_path;
+    http_major_version_ = http_major_version;
+    http_minor_version_ = http_minor_version;
   }
 
   HttpServer::~HttpServer() {}

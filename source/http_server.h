@@ -9,8 +9,8 @@ namespace http_server {
   
   class HttpServer {
    public:
-    HttpServer();
-    HttpServer(const std::string& ip_address, const int port, const std::string& root_path);
+    HttpServer() = delete;
+    HttpServer(const std::string& ip_address, const int port, const std::string& root_path, const int http_major_version, const int http_minor_version);
     ~HttpServer();
     void run();
     std::string get_requested_object(const std::string& object_url);
@@ -18,6 +18,8 @@ namespace http_server {
     std::string ip_address_;
     int port_;
     std::string root_path_;
+    int http_major_version_;
+    int http_minor_version_;
   };
 
 }
