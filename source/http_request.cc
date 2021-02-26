@@ -1,5 +1,6 @@
 #include "http_request.h"
 
+#include <iostream>
 #include <string>
 #include <map>
 #include <exception>
@@ -24,8 +25,13 @@ namespace http_server {
     size_t second_delim_pos = request_line.find(' ', first_delim_pos + 1);
     uri_ = HttpRequestUri(request_line.substr(first_delim_pos + 1, second_delim_pos - first_delim_pos - 1));
 
-    // Extract the http version from the request_line.
-    http_version_ = request_line.substr(second_delim_pos + 1);
+    // Extract the http version numbers from the request_line.
+    std::string http_version = request_line.substr(second_delim_pos + 1);
+    std::cout << http_version << std::endl;
+    size_t protocol_version_delim_pos = http_version.find('/');
+    size_t version_number_delim_pos = http_version.find('.');
+    http_major_version_ = std::stoi(http_version.substr(protocol_version_delim_pos + 1, version_number_delim_pos));
+    http_minor_version_ = std::stoi(http_version.substr(version_number_delim_pos + 1));
 
     // Extract the optional header lines until reaching the blank line.
     while ((line_size = boost::asio::read_until(socket, boost::asio::dynamic_buffer(buffer), "\r\n")) > 2) {
@@ -53,8 +59,16 @@ namespace http_server {
     return uri_;
   }
 
+  int HttpRequest::get_http_major_version() {
+    return http_major_version_;
+  }
+
+  int HttpRequest::get_http_minor_version() {
+    return http_minor_version_;
+  }
+
   std::string HttpRequest::get_http_version() {
-    return http_version_;
+    return std::to_string(http_major_version_) + "." + std::to_string(http_minor_version_);
   }
 
   std::string HttpRequest::get_header_value(const std::string& header_name) {

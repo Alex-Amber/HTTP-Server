@@ -16,13 +16,16 @@ namespace http_server {
     ~HttpRequest();
     std::string get_method();
     HttpRequestUri get_uri();
+    int get_http_major_version();
+    int get_http_minor_version();
     std::string get_http_version();
     std::string get_header_value(const std::string& header_name);
     std::string get_entity_body();
    private:
     std::string method_;
     HttpRequestUri uri_;
-    std::string http_version_;
+    int http_major_version_;
+    int http_minor_version_;
     std::map<std::string, std::string> headers_;
     std::string entity_body_;
   };
