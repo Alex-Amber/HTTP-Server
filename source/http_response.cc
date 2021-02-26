@@ -15,7 +15,7 @@ namespace http_server {
 
   std::string HttpResponse::str() {
     std::string serialized_response;
-    serialized_response += (http_version_ + " " + status_.get_status() + "\r\n");
+    serialized_response += (this->get_http_version() + " " + status_.get_status() + "\r\n");
     for (auto& entry : headers_) {
       serialized_response += (entry.first + ": " + entry.second + "\r\n");
     }
@@ -31,7 +31,7 @@ namespace http_server {
   }
 
   std::string HttpResponse::get_http_version() {
-    return http_version_;
+    return std::to_string(http_major_version_) + "." + std::to_string(http_minor_version_);
   }
 
   std::string HttpResponse::get_status() {
@@ -57,9 +57,12 @@ namespace http_server {
     return entity_body_;
   }
 
-  void HttpResponse::set_http_version(const std::string& http_version) {
-    http_version_ = http_version;
-    return;
+  void HttpResponse::set_http_major_version(int http_major_version) {
+    http_major_version_ = http_major_version;
+  }
+
+  void HttpResponse::set_http_minor_version(int http_minor_version) {
+    http_minor_version_ = http_minor_version;
   }
 
   void HttpResponse::set_status(const int status_code) {
@@ -68,7 +71,6 @@ namespace http_server {
 
   void HttpResponse::add_header_field(const std::string& header_name, const std::string& header_value) {
     headers_[header_name] = header_value;
-    return;
   }
 
   void HttpResponse::set_entity_body(const std::string& entity_body) {

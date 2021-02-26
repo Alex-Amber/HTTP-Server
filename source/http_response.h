@@ -21,12 +21,14 @@ namespace http_server {
     std::string get_status_description();
     std::string get_header_value(const std::string& header_name);
     std::string get_entity_body();
-    void set_http_version(const std::string& http_version);
+    void set_http_major_version(int http_major_version);
+    void set_http_minor_version(int http_minor_version);
     void set_status(const int status_code);
     void add_header_field(const std::string& header_name, const std::string& header_value);
     void set_entity_body(const std::string& entity_body);
    private:
-    std::string http_version_;
+    int http_major_version_;
+    int http_minor_version_;
     HttpResponseStatus status_;
     std::map<std::string, std::string> headers_;
     std::string entity_body_;

@@ -43,7 +43,11 @@ namespace http_server {
         std::string requested_object = get_requested_object(object_relative_path);
         // Construct the response object and send it to the client through socket.
         HttpResponse response;
-        response.set_http_version(request.get_http_version());
+        // TODO(jinxinwang): verify the logic of determining the http version 
+        // of the response when the http request and the server have different 
+        // http versions.
+        response.set_http_major_version(http_major_version_);
+        response.set_http_minor_version(http_minor_version_);
         response.set_status(200);
         response.set_entity_body(requested_object);
         response.sent_through_socket(socket);
