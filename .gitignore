@@ -1,0 +1,15 @@
+.vscode/
+
+bazel-*
+
+build/
+
+third_party/
+
+BUILD
+**/BUILD
+**/**/BUILD
+**/**/**/BUILD
+
+WORKSPACE
+
