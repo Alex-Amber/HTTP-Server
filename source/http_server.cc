@@ -36,21 +36,35 @@ namespace http_server {
         acceptor.accept(socket);
         // Read the HTTP request from the socket.
         HttpRequest request(socket);
-        // Extract the requested object url.
-        std::string object_relative_path = request.get_uri().get_absolute_path();
-        std::cout << object_relative_path << std::endl;
-        // Get the requested object.
-        std::string requested_object = get_requested_object(object_relative_path);
-        // Construct the response object and send it to the client through socket.
-        HttpResponse response;
-        // TODO(jinxinwang): verify the logic of determining the http version 
-        // of the response when the http request and the server have different 
-        // http versions.
-        response.set_http_major_version(http_major_version_);
-        response.set_http_minor_version(http_minor_version_);
-        response.set_status(200);
-        response.set_entity_body(requested_object);
-        response.sent_through_socket(socket);
+        int request_http_major_version = request.get_http_major_version();
+        int request_http_minor_version = request.get_http_minor_version();
+        // Handle the situation where the request's http version is higher than
+        // the server's http version.
+        if (request_http_major_version > http_major_version_ || 
+            (request_http_major_version == http_major_version_ && 
+            request_http_minor_version > http_minor_version_)) {
+          HttpResponse response;
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(505);
+          response.sent_through_socket(socket);
+        } else {
+          // Extract the requested object url.
+          std::string object_relative_path = request.get_uri().get_absolute_path();
+          std::cout << object_relative_path << std::endl;
+          // Get the requested object.
+          std::string requested_object = get_requested_object(object_relative_path);
+          // Construct the response object and send it to the client through socket.
+          HttpResponse response;
+          // TODO(jinxinwang): verify the logic of determining the http version 
+          // of the response when the http request and the server have different 
+          // http versions.
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(200);
+          response.set_entity_body(requested_object);
+          response.sent_through_socket(socket);
+        }
       }
     }
     catch (std::exception& e) {
