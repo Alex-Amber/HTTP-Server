@@ -13,7 +13,7 @@ namespace http_server {
     HttpServer(const std::string& ip_address, const int port, const std::string& root_path, const int http_major_version, const int http_minor_version);
     ~HttpServer();
     void run();
-    std::string get_requested_object(const std::string& object_url);
+    int get_requested_object(const std::string &object_relative_path, std::string &requested_object);
    private:
     std::string ip_address_;
     int port_;

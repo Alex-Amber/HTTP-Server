@@ -65,17 +65,25 @@ namespace http_server {
           std::string object_relative_path = request.get_uri().get_absolute_path();
           std::cout << object_relative_path << std::endl;
           // Get the requested object.
-          std::string requested_object = get_requested_object(object_relative_path);
-          // Construct the response object and send it to the client through socket.
-          HttpResponse response;
-          // TODO(jinxinwang): verify the logic of determining the http version 
-          // of the response when the http request and the server have different 
-          // http versions.
-          response.set_http_major_version(http_major_version_);
-          response.set_http_minor_version(http_minor_version_);
-          response.set_status(200);
-          response.set_entity_body(requested_object);
-          response.sent_through_socket(socket);
+          std::string requested_object;
+          if (!get_requested_object(object_relative_path, requested_object)) {
+            // Construct the response object and send it to the client through socket.
+            HttpResponse response;
+            // TODO(jinxinwang): verify the logic of determining the http version 
+            // of the response when the http request and the server have different 
+            // http versions.
+            response.set_http_major_version(http_major_version_);
+            response.set_http_minor_version(http_minor_version_);
+            response.set_status(200);
+            response.set_entity_body(requested_object);
+            response.sent_through_socket(socket);
+          } else {
+            HttpResponse response;
+            response.set_http_major_version(http_major_version_);
+            response.set_http_minor_version(http_minor_version_);
+            response.set_status(404);
+            response.sent_through_socket(socket);
+          }
         }
       }
     }
@@ -85,7 +93,7 @@ namespace http_server {
     return;
   }
 
-  std::string HttpServer::get_requested_object(const std::string& object_relative_path) {
+  int HttpServer::get_requested_object(const std::string &object_relative_path, std::string &requested_object) {
     // Check the validity of the argument object_url.
 
     std::string object_absolute_path = root_path_ + object_relative_path;
@@ -94,10 +102,11 @@ namespace http_server {
     if (ifs) {
       // Read the entire content of the file into a string
       oss << ifs.rdbuf();
+      requested_object = oss.str();
+      return 0;
     } else {
-      throw std::runtime_error("Fail to access the requested object.");
+      return 1;
     }
-    return oss.str();
   }
 }
 
