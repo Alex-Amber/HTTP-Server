@@ -48,6 +48,18 @@ namespace http_server {
           response.set_http_minor_version(http_minor_version_);
           response.set_status(505);
           response.sent_through_socket(socket);
+        } else if (request.get_method() == "HEAD") {
+          HttpResponse response;
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(405);
+          response.sent_through_socket(socket);
+        } else if (request.get_method() != "GET" && request.get_method() != "HEAD") {
+          HttpResponse response;
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(501);
+          response.sent_through_socket(socket);
         } else {
           // Extract the requested object url.
           std::string object_relative_path = request.get_uri().get_absolute_path();
