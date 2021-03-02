@@ -9,8 +9,10 @@
 #include "http_request_uri.h"
 
 namespace http_server {
-  
-  HttpRequest::HttpRequest(boost::asio::ip::tcp::socket& socket) {
+
+  HttpRequest::~HttpRequest() {}
+
+  int HttpRequest::parse_from_socket(boost::asio::ip::tcp::socket& socket) {
     // Read the request line from the socket.
     std::string buffer;
     size_t line_size = boost::asio::read_until(socket, boost::asio::dynamic_buffer(buffer), "\r\n");
@@ -47,9 +49,8 @@ namespace http_server {
 
     // If the entity body exists, extract it.
 
+    return 0;
   }
-
-  HttpRequest::~HttpRequest() {}
 
   std::string HttpRequest::get_method() {
     return method_;

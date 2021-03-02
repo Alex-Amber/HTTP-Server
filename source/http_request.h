@@ -11,15 +11,15 @@ namespace http_server {
   
   class HttpRequest {
    public:
-    HttpRequest() = delete;
-    HttpRequest(boost::asio::ip::tcp::socket& socket);
+    HttpRequest() = default;
     ~HttpRequest();
+    int parse_from_socket(boost::asio::ip::tcp::socket &socket);
     std::string get_method();
     HttpRequestUri get_uri();
     int get_http_major_version();
     int get_http_minor_version();
     std::string get_http_version();
-    std::string get_header_value(const std::string& header_name);
+    std::string get_header_value(const std::string &header_name);
     std::string get_entity_body();
    private:
     std::string method_;

@@ -34,8 +34,17 @@ namespace http_server {
       for (;;) {
         boost::asio::ip::tcp::socket socket(io_context);
         acceptor.accept(socket);
+        HttpRequest request;
         // Read the HTTP request from the socket.
-        HttpRequest request(socket);
+        // Handle the situations where requests cannot be parsed correctly.
+        if (request.parse_from_socket(socket)) {
+          HttpResponse response;
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(400);
+          response.sent_through_socket(socket);
+          continue;
+        }
         int request_http_major_version = request.get_http_major_version();
         int request_http_minor_version = request.get_http_minor_version();
         // Handle the situation where the request's http version is higher than
@@ -48,43 +57,47 @@ namespace http_server {
           response.set_http_minor_version(http_minor_version_);
           response.set_status(505);
           response.sent_through_socket(socket);
-        } else if (request.get_method() == "HEAD") {
+          continue;
+        }
+        if (request.get_method() == "HEAD") {
           HttpResponse response;
           response.set_http_major_version(http_major_version_);
           response.set_http_minor_version(http_minor_version_);
           response.set_status(405);
           response.sent_through_socket(socket);
-        } else if (request.get_method() != "GET" && request.get_method() != "HEAD") {
+          continue;
+        }
+        if (request.get_method() != "GET" && request.get_method() != "HEAD") {
           HttpResponse response;
           response.set_http_major_version(http_major_version_);
           response.set_http_minor_version(http_minor_version_);
           response.set_status(501);
           response.sent_through_socket(socket);
-        } else {
-          // Extract the requested object url.
-          std::string object_relative_path = request.get_uri().get_absolute_path();
-          std::cout << object_relative_path << std::endl;
-          // Get the requested object.
-          std::string requested_object;
-          if (!get_requested_object(object_relative_path, requested_object)) {
-            // Construct the response object and send it to the client through socket.
-            HttpResponse response;
-            // TODO(jinxinwang): verify the logic of determining the http version 
-            // of the response when the http request and the server have different 
-            // http versions.
-            response.set_http_major_version(http_major_version_);
-            response.set_http_minor_version(http_minor_version_);
-            response.set_status(200);
-            response.set_entity_body(requested_object);
-            response.sent_through_socket(socket);
-          } else {
-            HttpResponse response;
-            response.set_http_major_version(http_major_version_);
-            response.set_http_minor_version(http_minor_version_);
-            response.set_status(404);
-            response.sent_through_socket(socket);
-          }
+          continue;
         }
+        // Extract the requested object url.
+        std::string object_relative_path = request.get_uri().get_absolute_path();
+        std::cout << object_relative_path << std::endl;
+        // Get the requested object.
+        std::string requested_object;
+        if (!get_requested_object(object_relative_path, requested_object)) {
+          // Construct the response object and send it to the client through socket.
+          HttpResponse response;
+          // TODO(jinxinwang): verify the logic of determining the http version 
+          // of the response when the http request and the server have different 
+          // http versions.
+          response.set_http_major_version(http_major_version_);
+          response.set_http_minor_version(http_minor_version_);
+          response.set_status(200);
+          response.set_entity_body(requested_object);
+          response.sent_through_socket(socket);
+          continue;
+        }
+        HttpResponse response;
+        response.set_http_major_version(http_major_version_);
+        response.set_http_minor_version(http_minor_version_);
+        response.set_status(404);
+        response.sent_through_socket(socket);
       }
     }
     catch (std::exception& e) {
