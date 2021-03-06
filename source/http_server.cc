@@ -42,50 +42,58 @@ namespace http_server {
         // http versions.
         response.set_http_major_version(http_major_version_);
         response.set_http_minor_version(http_minor_version_);
-        // Read the HTTP request from the socket.
-        // Handle the situations where requests cannot be parsed correctly.
-        if (request.parse_from_socket(socket)) {
-          response.set_status(400);
+        try {
+          // Read the HTTP request from the socket.
+          // Handle the situations where requests cannot be parsed correctly.
+          if (request.parse_from_socket(socket)) {
+            response.set_status(400);
+            response.sent_through_socket(socket);
+            continue;
+          }
+          int request_http_major_version = request.get_http_major_version();
+          int request_http_minor_version = request.get_http_minor_version();
+          // Handle the situation where the request's http version is higher than
+          // the server's http version.
+          if (request_http_major_version > http_major_version_ || 
+              (request_http_major_version == http_major_version_ && 
+              request_http_minor_version > http_minor_version_)) {
+            response.set_status(505);
+            response.sent_through_socket(socket);
+            continue;
+          }
+          if (request.get_method() == "HEAD") {
+            response.set_status(405);
+            response.sent_through_socket(socket);
+            continue;
+          }
+          if (request.get_method() != "GET" && request.get_method() != "HEAD") {
+            response.set_status(501);
+            response.sent_through_socket(socket);
+            continue;
+          }
+          // Extract the requested object url.
+          std::string object_relative_path = request.get_uri().get_absolute_path();
+          std::cout << object_relative_path << std::endl;
+          // Get the requested object.
+          std::string requested_object;
+          // Handle the error that the server failed to get the requested object.
+          if (get_requested_object(object_relative_path, requested_object)) {
+            response.set_status(404);
+            response.sent_through_socket(socket);
+            continue;
+          }
+          response.set_status(200);
+          response.set_entity_body(requested_object);
           response.sent_through_socket(socket);
-          continue;
         }
-        int request_http_major_version = request.get_http_major_version();
-        int request_http_minor_version = request.get_http_minor_version();
-        // Handle the situation where the request's http version is higher than
-        // the server's http version.
-        if (request_http_major_version > http_major_version_ || 
-            (request_http_major_version == http_major_version_ && 
-            request_http_minor_version > http_minor_version_)) {
-          response.set_status(505);
+        // Handle all other errors happening during fulfilling the request.
+        catch (std::exception &e) {
+          response.set_status(500);
           response.sent_through_socket(socket);
-          continue;
         }
-        if (request.get_method() == "HEAD") {
-          response.set_status(405);
-          response.sent_through_socket(socket);
-          continue;
-        }
-        if (request.get_method() != "GET" && request.get_method() != "HEAD") {
-          response.set_status(501);
-          response.sent_through_socket(socket);
-          continue;
-        }
-        // Extract the requested object url.
-        std::string object_relative_path = request.get_uri().get_absolute_path();
-        std::cout << object_relative_path << std::endl;
-        // Get the requested object.
-        std::string requested_object;
-        if (get_requested_object(object_relative_path, requested_object)) {
-          response.set_status(404);
-          response.sent_through_socket(socket);
-          continue;
-        }
-        response.set_status(200);
-        response.set_entity_body(requested_object);
-        response.sent_through_socket(socket);
       }
     }
-    catch (std::exception& e) {
+    catch (std::exception &e) {
       std::cerr << e.what() << std::endl;
     }
     return;
