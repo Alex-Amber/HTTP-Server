@@ -29,7 +29,6 @@ namespace http_server {
 
     // Extract the http version numbers from the request_line.
     std::string http_version = request_line.substr(second_delim_pos + 1);
-    std::cout << http_version << std::endl;
     size_t protocol_version_delim_pos = http_version.find('/');
     size_t version_number_delim_pos = http_version.find('.');
     http_major_version_ = std::stoi(http_version.substr(protocol_version_delim_pos + 1, version_number_delim_pos));
