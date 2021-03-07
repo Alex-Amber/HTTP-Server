@@ -31,7 +31,7 @@ namespace http_server {
   }
 
   std::string HttpResponse::get_http_version() {
-    return std::to_string(http_major_version_) + "." + std::to_string(http_minor_version_);
+    return "HTTP/" + std::to_string(http_major_version_) + "." + std::to_string(http_minor_version_);
   }
 
   std::string HttpResponse::get_status() {
