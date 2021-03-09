@@ -1,0 +1,3 @@
+add_library(http_request_uri http_request_uri.cc)
+
+add_library(http_response_status http_response_status.cc)
