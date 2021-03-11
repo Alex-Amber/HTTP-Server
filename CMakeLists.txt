@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.11)
-# Include the following modules to use.
-include(FetchContent)
 # Set the project name and version
 project(HttpServer VERSION 0.1)
+# Include the following modules to use.
+include(FetchContent)
+include(CTest)
 
 message(${CMAKE_SOURCE_DIR})
 message(${CMAKE_BINARY_DIR})
