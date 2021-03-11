@@ -1,6 +1,6 @@
-#include "source/http_server.h"
-#include "source/http_request.h"
-#include "source/http_response.h"
+#include "http_server.h"
+#include "http_request.h"
+#include "http_response.h"
 
 #include <iostream>
 #include <fstream>
