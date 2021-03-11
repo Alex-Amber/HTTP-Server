@@ -7,7 +7,7 @@ class FooTest : public ::testing::Test {
   void TearDown() override {}
 };
 
-Test_F(FooTest, DumbTest) {
+TEST_F(FooTest, DumbTest) {
   EXPECT_TRUE(true);
   EXPECT_FALSE(false);
 }

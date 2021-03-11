@@ -1,10 +1,25 @@
 cmake_minimum_required(VERSION 3.11)
-
+# Include the following modules to use.
+include(FetchContent)
 # Set the project name and version
 project(HttpServer VERSION 0.1)
 
 message(${CMAKE_SOURCE_DIR})
 message(${CMAKE_BINARY_DIR})
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.10.0
+  SOURCE_SUBDIR  .
+)
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+  FetchContent_Populate(googletest)
+  message(${googletest_SOURCE_DIR})
+  message(${googletest_BINARY_DIR})
+  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+endif()
 
 # Specify the C++ standard
 # Must be placed before the call to add_executable()
