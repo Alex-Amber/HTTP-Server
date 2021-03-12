@@ -19,6 +19,10 @@ target_link_libraries(http_response http_response_status ${Boost_LIBRARIES})
 add_library(http_server http_server.cc)
 target_link_libraries(http_server http_request http_response ${Boost_LIBRARIES})
 
+add_executable(http_response_status_test http_response_status_test.cc)
+target_link_libraries(http_response_status_test http_response_status gtest_main)
+add_test(NAME http_response_status_test COMMAND http_response_status_test)
+
 add_executable(http_server_test http_server_test.cc)
 target_link_libraries(http_server_test gtest_main)
 add_test(NAME http_server_test COMMAND http_server_test)
