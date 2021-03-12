@@ -34,14 +34,3 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(source)
-
-find_package(Boost REQUIRED)
-
-include_directories(${Boost_INCLUDE_DIRS})
-# Add the executable
-# Executable refers to the file containing the main() function
-add_executable(http_server_main main/main.cc)
-
-target_include_directories(http_server_main BEFORE PRIVATE ${CMAKE_SOURCE_DIR})
-
-target_link_libraries(http_server_main http_server)
