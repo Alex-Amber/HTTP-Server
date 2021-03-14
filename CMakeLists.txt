@@ -22,6 +22,20 @@ if(NOT googletest_POPULATED)
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
+FetchContent_Declare(
+  libcurl
+  GIT_REPOSITORY https://github.com/curl/curl.git
+  GIT_TAG        curl-7_75_0
+  SOURCE_SUBDIR  .
+)
+FetchContent_GetProperties(libcurl)
+if(NOT libcurl_POPULATED)
+  FetchContent_Populate(libcurl)
+  message(${libcurl_SOURCE_DIR})
+  message(${libcurl_BINARY_DIR})
+  add_subdirectory(${libcurl_SOURCE_DIR} ${libcurl_BINARY_DIR})
+endif()
+
 # Specify the C++ standard
 # Must be placed before the call to add_executable()
 set(CMAKE_CXX_STANDARD 11)
